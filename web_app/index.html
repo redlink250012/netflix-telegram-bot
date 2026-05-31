@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Netflix Player</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Login View -->
+    <div id="loginView">
+      <div class="header">
+        <div class="logo">N</div>
+        <h1>Netflix Player</h1>
+        <p class="subtitle">Pegá tus cookies de Netflix para acceder</p>
+      </div>
+      <div class="card">
+        <label for="cookies">Cookies de Netflix</label>
+        <textarea id="cookies" placeholder="NetflixId=xxx; SecureNetflixId=xxx; ..." rows="5" spellcheck="false"></textarea>
+        <div class="hint">Formato: NetflixId=valor; SecureNetflixId=valor; ...</div>
+        <button id="btnCheck" onclick="checkCookies()">Ingresar</button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardView" class="hidden">
+      <div class="dash-header">
+        <div class="dash-logo">N</div>
+        <div class="dash-title">Netflix</div>
+        <div class="dash-status" id="statusDot"></div>
+      </div>
+
+      <div id="accountInfo"></div>
+
+      <div class="actions">
+        <button id="btnOpen" onclick="openNetflix()" class="btn-play">▶ Abrir Netflix</button>
+        <button onclick="exportCookies()" class="btn-sec">📦 Exportar Cookies</button>
+        <button onclick="showQR()" class="btn-sec">📱 Ver JSON Cookies</button>
+        <button onclick="goBack()" class="btn-sec" style="background:#333">← Volver</button>
+      </div>
+
+      <!-- QR Modal -->
+      <div id="qrModal" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-close" onclick="closeQR()">✕</div>
+          <h3>Cookies para importar</h3>
+          <p style="color:#999;font-size:12px;margin-bottom:12px">Copiá este JSON e importalo en Cookie-Editor</p>
+          <div id="qrContainer"></div>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div id="toast" class="toast hidden"></div>
+    </div>
+
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

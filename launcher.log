@@ -1,0 +1,28 @@
+[16:41:25] Iniciando servidor bot...
+[16:41:31] Servidor OK en puerto 8080
+[16:41:31] Iniciando tunel cloudflared...
+[16:41:35] URL publica: https://asus-bond-islands-homeland.trycloudflare.com
+[16:41:35] Configurando bot con URL: https://asus-bond-islands-homeland.trycloudflare.com
+[16:41:35] Configurando bot en Telegram...
+[16:41:36] Menu button actualizado OK
+[16:41:39] Verificando tunel...
+[16:41:39] Tunel OK - respuesta: Netflix Cookie Browser API
+[16:41:40] 
+[16:41:40] =======================================================
+[16:41:40]   SISTEMA INICIADO CORRECTAMENTE
+[16:41:40] =======================================================
+[16:41:40] 
+[16:41:40]   Mini App URL: https://asus-bond-islands-homeland.trycloudflare.com/web_app/index.html
+[16:41:40] 
+[16:41:40]   1. Abri Telegram en tu celular
+[16:41:40]   2. Busca @HMC_VERIFICADOR_bot
+[16:41:40]   3. Toca el boton "Abrir Netflix" en el menu
+[16:41:40]   4. Pega tus cookies y toca "Ingresar"
+[16:41:40]   5. Toca "▶ Abrir Netflix" para abrir Netflix
+[16:41:40] 
+[16:41:40]   (Android: funciona dentro del WebView de Telegram)
+[16:41:40]   (Desktop: anda a la Mini App URL directo desde Chrome)
+[16:41:40] 
+[16:41:40]   Deja esta ventana abierta mientras uses la app.
+[16:41:40]   Presiona Ctrl+C para detener todo.
+[16:41:40] 

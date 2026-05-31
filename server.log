@@ -1,0 +1,16 @@
+2026-05-31 16:41:26,739 [INFO] \U0001f525 Servidor iniciado en http://0.0.0.0:8080
+2026-05-31 16:41:26,739 [INFO] \U0001f4f1 Web App: http://localhost:8080/web_app/index.html
+2026-05-31 16:41:26,739 [INFO] \U0001f916 Bot corriendo con polling
+2026-05-31 16:41:27,233 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/getMe "HTTP/1.1 200 OK"
+2026-05-31 16:41:27,234 [INFO] Scheduler started
+2026-05-31 16:41:27,234 [INFO] Application started
+2026-05-31 16:41:27,382 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/deleteWebhook "HTTP/1.1 200 OK"
+======== Running on http://0.0.0.0:8080 ========
+(Press CTRL+C to quit)
+2026-05-31 16:41:31,315 [INFO] 127.0.0.1 [31/May/2026:16:41:31 -0600] "GET / HTTP/1.1" 200 304 "-" "python-requests/2.31.0"
+2026-05-31 16:41:37,836 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/getUpdates "HTTP/1.1 200 OK"
+2026-05-31 16:41:39,823 [INFO] 127.0.0.1 [31/May/2026:16:41:39 -0600] "GET / HTTP/1.1" 200 304 "-" "python-requests/2.31.0"
+2026-05-31 16:41:48,002 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/getUpdates "HTTP/1.1 200 OK"
+2026-05-31 16:41:58,167 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/getUpdates "HTTP/1.1 200 OK"
+2026-05-31 16:42:08,324 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/getUpdates "HTTP/1.1 200 OK"
+2026-05-31 16:42:18,476 [INFO] HTTP Request: POST https://api.telegram.org/bot8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM/getUpdates "HTTP/1.1 200 OK"
