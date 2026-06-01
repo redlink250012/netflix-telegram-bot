@@ -9,8 +9,7 @@ let currentTokenUrl = '';
 
 const loginView = document.getElementById('loginView');
 const dashView = document.getElementById('dashboardView');
-var proxyView = document.getElementById('proxyView');
-var proxyFrame = document.getElementById('proxyFrame');
+
 const cookiesInput = document.getElementById('cookies');
 const btnCheck = document.getElementById('btnCheck');
 const accountInfo = document.getElementById('accountInfo');
@@ -150,7 +149,11 @@ function closeQR() {
 }
 
 function openProxyView() {
-  var proxyUrl = '/proxy/browse?user_id=' + encodeURIComponent(userId);
+  if (!currentData || !currentData.proxy_url) {
+    showToast('Primero pegá las cookies y verificá', 3000);
+    return;
+  }
+  var proxyUrl = currentData.proxy_url;
   if (tg && tg.openLink) {
     tg.openLink(window.location.origin + proxyUrl);
   } else {

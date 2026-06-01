@@ -1,5 +1,6 @@
 import os
 import json
+import uuid
 import logging
 from urllib.parse import urljoin, quote
 
@@ -126,10 +127,10 @@ async def handle_api_check(request: web.Request) -> web.Response:
     except Exception:
         return web.Response(text='{"error": "JSON inválido"}', content_type="application/json", charset="utf-8", status=400)
 
-    # Store cookies for proxy use
-    if user_id:
-        cookies_store[user_id] = cookie_str
-        save_cookies_store(cookies_store)
+    # Generate session token for proxy access
+    session_id = str(uuid.uuid4())[:8]
+    cookies_store[session_id] = cookie_str
+    save_cookies_store(cookies_store)
 
     result = check_cookies(cookie_str)
 
@@ -149,6 +150,8 @@ async def handle_api_check(request: web.Request) -> web.Response:
         for name, value in cookies.items()
     ]
     result["cookies_json"] = json.dumps(json_format, ensure_ascii=False)
+    result["session_id"] = session_id
+    result["proxy_url"] = f"/proxy/browse?session_id={session_id}"
 
     return web.Response(text=json.dumps(result, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
@@ -185,11 +188,12 @@ async def handle_proxy(request: web.Request) -> web.Response:
     path = request.match_info.get("path", "/")
     if not path.startswith("/"):
         path = "/" + path
-    user_id = request.query.get("user_id", "")
-    if not user_id or user_id not in cookies_store:
-        return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>❌ Sesión expirada</h1><p>Volvé al inicio y pegá las cookies de nuevo.</p></body></html>', content_type="text/html", charset="utf-8")
-
-    cookies_str = cookies_store[user_id]
+    session_id = request.query.get("session_id", "")
+    cookies_str = ""
+    if session_id and session_id in cookies_store:
+        cookies_str = cookies_store[session_id]
+    if not cookies_str:
+        return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>❌ Sesión expirada</h1><p>Volvé a la Mini App, pegá las cookies de nuevo y probá otra vez.</p><a href="javascript:history.back()" style="display:inline-block;background:#e50914;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:16px;margin-top:16px">← Volver</a></body></html>', content_type="text/html", charset="utf-8")
     cookies = parse_cookies(cookies_str)
     base_url = f"https://{request.host}/proxy"
     headers = {
@@ -213,11 +217,11 @@ async def handle_proxy(request: web.Request) -> web.Response:
                         for el in soup.find_all(tag, **{attr: True}):
                             val = el[attr]
                             if val.startswith("//"):
-                                el[attr] = f"{base_url}/https:{val}?user_id={user_id}"
+                                el[attr] = f"{base_url}/https:{val}?session_id={session_id}"
                             elif val.startswith("/"):
-                                el[attr] = f"{base_url}{val}?user_id={user_id}"
+                                el[attr] = f"{base_url}{val}?session_id={session_id}"
                             elif any(d in val for d in nf_domains):
-                                el[attr] = f"{base_url}/{val}?user_id={user_id}"
+                                el[attr] = f"{base_url}/{val}?session_id={session_id}"
                     return web.Response(text=str(soup), content_type="text/html", charset="utf-8")
                 else:
                     content = await resp.read()
