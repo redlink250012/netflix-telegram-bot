@@ -127,12 +127,15 @@ async def handle_api_check(request: web.Request) -> web.Response:
     except Exception:
         return web.Response(text='{"error": "JSON inválido"}', content_type="application/json", charset="utf-8", status=400)
 
+    result = check_cookies(cookie_str)
+
     # Generate session token for proxy access
     session_id = str(uuid.uuid4())[:8]
     cookies_store[session_id] = cookie_str
-    save_cookies_store(cookies_store)
-
-    result = check_cookies(cookie_str)
+    try:
+        save_cookies_store(cookies_store)
+    except Exception:
+        pass
 
     # Add cookies_json for Cookie-Editor export
     cookies = parse_cookies(cookie_str)
