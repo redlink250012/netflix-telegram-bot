@@ -34,10 +34,22 @@
 
       <div id="accountInfo"></div>
 
+      <div class="instructions">
+        <p style="color:#46d369;font-size:14px;font-weight:bold;margin-bottom:8px">✅ Cookies verificadas</p>
+        <p style="color:#999;font-size:12px;margin-bottom:4px">Para acceder a Netflix:</p>
+        <ol style="color:#bbb;font-size:12px;margin:0;padding-left:20px">
+          <li>Tocá <strong>"📋 Copiar JSON"</strong></li>
+          <li>Abrí Netflix en Chrome</li>
+          <li>Abrí extensión <strong>Cookie-Editor</strong></li>
+          <li>Click <strong>Import</strong> → pegar → <strong>Guardar</strong></li>
+          <li>Refrescá Netflix → Ya estás logueado</li>
+        </ol>
+      </div>
+
       <div class="actions">
-        <button id="btnOpen" onclick="openNetflix()" class="btn-play">▶ Abrir Netflix</button>
-        <button onclick="exportCookies()" class="btn-sec">📦 Exportar Cookies</button>
-        <button onclick="showQR()" class="btn-sec">📱 Ver JSON Cookies</button>
+        <button onclick="exportCookies()" class="btn-play" style="background:#e50914">📋 Copiar JSON para Cookie-Editor</button>
+        <button id="btnOpen" onclick="openNetflix()" class="btn-sec">▶ Probar Token (Android)</button>
+        <button onclick="showQR()" class="btn-sec">📱 Ver JSON</button>
         <button onclick="goBack()" class="btn-sec" style="background:#333">← Volver</button>
       </div>
 
@@ -46,7 +58,7 @@
         <div class="modal-content">
           <div class="modal-close" onclick="closeQR()">✕</div>
           <h3>Cookies para importar</h3>
-          <p style="color:#999;font-size:12px;margin-bottom:12px">Copiá este JSON e importalo en Cookie-Editor</p>
+          <p style="color:#999;font-size:12px;margin-bottom:12px">1. Copiá este JSON  2. Cookie-Editor → Import</p>
           <div id="qrContainer"></div>
         </div>
       </div>
