@@ -139,7 +139,7 @@ async def handle_api_browse(request: web.Request) -> web.Response:
         cookie_str = body.get("cookies", "")
         path = body.get("path", "/")
     except Exception:
-        return web.json_response({"error": "JSON inválido"}, status=400)
+        return web.Response(text='{"error": "JSON inválido"}', content_type="application/json", charset="utf-8", status=400)
 
     cookies = parse_cookies(cookie_str)
     headers = {
@@ -156,14 +156,9 @@ async def handle_api_browse(request: web.Request) -> web.Response:
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                 html = await resp.text()
-        return web.json_response({
-            "ok": True,
-            "html": html,
-            "url": str(resp.url),
-            "status": resp.status,
-        })
+        return web.Response(text=json.dumps({"ok": True, "html": html, "url": str(resp.url), "status": resp.status}, ensure_ascii=False), content_type="application/json", charset="utf-8")
     except Exception as e:
-        return web.json_response({"ok": False, "error": str(e)[:100]})
+        return web.Response(text=json.dumps({"ok": False, "error": str(e)[:100]}, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
 
 async def handle_static(request: web.Request) -> web.Response:
