@@ -25,9 +25,23 @@ BROWSER_UAS = [
 
 def parse_cookies(cookie_str: str) -> dict:
     cookies = {}
-    # Try Netscape format first (tab-separated columns)
-    if "\t" in cookie_str and ("netflix.com" in cookie_str or ".netflix.com" in cookie_str):
-        for line in cookie_str.strip().split("\n"):
+    stripped = cookie_str.strip()
+
+    # Try JSON format (Cookie-Editor array)
+    if stripped.startswith("[{"):
+        try:
+            items = json.loads(stripped)
+            for item in items:
+                if isinstance(item, dict) and "name" in item and "value" in item:
+                    cookies[item["name"]] = item["value"]
+            if cookies:
+                return cookies
+        except json.JSONDecodeError:
+            pass
+
+    # Try Netscape format (tab-separated columns)
+    if "\t" in stripped and ("netflix.com" in stripped or ".netflix.com" in stripped):
+        for line in stripped.split("\n"):
             parts = line.strip().split("\t")
             if len(parts) >= 7:
                 name = parts[5].strip()
@@ -35,8 +49,9 @@ def parse_cookies(cookie_str: str) -> dict:
                 cookies[name] = value
         if cookies:
             return cookies
+
     # Standard key=value; key=value format
-    for part in cookie_str.split(";"):
+    for part in stripped.split(";"):
         part = part.strip()
         if "=" in part:
             key, value = part.split("=", 1)
