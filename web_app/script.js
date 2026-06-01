@@ -148,10 +148,9 @@ function closeQR() {
   qrModal.classList.add('hidden');
 }
 
-async function checkAndOpenProxy() {
+async function checkAndOpenProxy(btn) {
   var input = cookiesInput.value.trim();
   if (!input) { showToast('Pega las cookies primero'); return; }
-  var btn = event.target;
   btn.disabled = true;
   btn.textContent = 'Cargando Netflix...';
   try {
