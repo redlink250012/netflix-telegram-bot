@@ -28,14 +28,15 @@ def parse_cookies(cookie_str: str) -> dict:
     stripped = cookie_str.strip()
 
     # Try JSON format (Cookie-Editor array)
-    if stripped.startswith("[{"):
+    if stripped.startswith("["):
         try:
             items = json.loads(stripped)
-            for item in items:
-                if isinstance(item, dict) and "name" in item and "value" in item:
-                    cookies[item["name"]] = item["value"]
-            if cookies:
-                return cookies
+            if isinstance(items, list):
+                for item in items:
+                    if isinstance(item, dict) and "name" in item and "value" in item:
+                        cookies[item["name"]] = item["value"]
+                if cookies:
+                    return cookies
         except json.JSONDecodeError:
             pass
 
