@@ -40,7 +40,7 @@ cookies_store = load_cookies_store()
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     btn = InlineKeyboardButton(
         text="Abrir Netflix Checker",
-        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html?v=3"),
+        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html"),
     )
     kb = InlineKeyboardMarkup([[btn]])
     await update.message.reply_text(
@@ -259,7 +259,11 @@ async def handle_static(request: web.Request) -> web.Response:
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
-        return web.Response(text=content, content_type=content_type, charset="utf-8")
+        resp = web.Response(text=content, content_type=content_type, charset="utf-8")
+        resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        resp.headers["Pragma"] = "no-cache"
+        resp.headers["Expires"] = "0"
+        return resp
     except FileNotFoundError:
         return web.Response(status=404, text="Not Found")
 
