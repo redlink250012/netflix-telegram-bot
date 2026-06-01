@@ -148,10 +148,11 @@ async def handle_api_browse(request: web.Request) -> web.Response:
     }
 
     url = urljoin("https://www.netflix.com", path)
+    connector = aiohttp.TCPConnector(ssl=False)
 
     try:
-        async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.get(url, timeout=aiohttp.ClientTimeout(total=15), ssl=False) as resp:
+        async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                 html = await resp.text()
         return web.json_response({
             "ok": True,
@@ -201,27 +202,35 @@ async def cors_middleware(request: web.Request, handler):
 
 
 async def run_bot(app: web.Application):
-    bot_app = (
-        Application.builder()
-        .token(BOT_TOKEN)
-        .build()
-    )
-    bot_app.add_handler(CommandHandler("start", start))
-    bot_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
+    try:
+        bot_app = (
+            Application.builder()
+            .token(BOT_TOKEN)
+            .build()
+        )
+        bot_app.add_handler(CommandHandler("start", start))
+        bot_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
 
-    await bot_app.initialize()
-    await bot_app.start()
-    await bot_app.updater.start_polling()
+        await bot_app.initialize()
+        await bot_app.start()
+        await bot_app.updater.start_polling()
 
-    app["bot_app"] = bot_app
+        app["bot_app"] = bot_app
+        log.info("✅ Bot de Telegram iniciado correctamente")
+    except Exception as e:
+        log.warning(f"⚠️ No se pudo iniciar el bot: {e}")
+        log.warning("El servidor web sigue funcionando sin el bot")
 
 
 async def cleanup(app: web.Application):
     bot_app = app.get("bot_app")
     if bot_app:
-        await bot_app.updater.stop()
-        await bot_app.stop()
-        await bot_app.shutdown()
+        try:
+            await bot_app.updater.stop()
+            await bot_app.stop()
+            await bot_app.shutdown()
+        except Exception:
+            pass
 
 
 def main():
