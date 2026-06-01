@@ -40,7 +40,7 @@ cookies_store = load_cookies_store()
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     btn = InlineKeyboardButton(
         text="Abrir Netflix Checker",
-        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html?v=2"),
+        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html?v=3"),
     )
     kb = InlineKeyboardMarkup([[btn]])
     await update.message.reply_text(
@@ -201,7 +201,19 @@ async def handle_proxy(request: web.Request) -> web.Response:
     if not cookies_str and user_id and user_id in cookies_store:
         cookies_str = cookies_store[user_id]
     if not cookies_str:
-        return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>❌ Sesión expirada</h1><p>Volvé a la Mini App, pegá las cookies de nuevo y probá otra vez.</p><a href="javascript:history.back()" style="display:inline-block;background:#e50914;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:16px;margin-top:16px">← Volver</a></body></html>', content_type="text/html", charset="utf-8")
+        # Also try POST body for cookies
+        if request.method == "POST":
+            try:
+                body = await request.json()
+                cookies_str = body.get("cookies", "")
+                if cookies_str:
+                    new_id = str(uuid.uuid4())[:8]
+                    cookies_store[new_id] = cookies_str
+                    save_cookies_store(cookies_store)
+                    return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>✅ Cookies recibidas</h1><p>Token: ' + new_id + '</p><script>window.location.href="/proxy/browse?session_id=' + new_id + '"</script></body></html>', content_type="text/html", charset="utf-8")
+            except Exception:
+                pass
+        return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>❌ Sesión expirada</h1><p>Pegá las cookies abajo y presioná "Ingresar":</p><form method="post" style="margin-top:16px"><textarea name="cookies" style="width:100%;height:120px;background:#2a2a2a;color:#fff;border:1px solid #e50914;border-radius:8px;padding:12px;font-family:monospace;font-size:12px"></textarea><button type="submit" style="background:#e50914;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;margin-top:12px">Ingresar</button></form><script>document.querySelector("form").addEventListener("submit",async function(e){e.preventDefault();var c=this.cookies.value;var r=await fetch("/proxy/browse?session_id=reload",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cookies:c})});var t=await r.text();document.body.innerHTML=t});history.replaceState(null,"","/proxy/browse")</script></body></html>', content_type="text/html", charset="utf-8")
     key_param = "session_id" if session_id else "user_id"
     key = session_id or user_id
     cookies = parse_cookies(cookies_str)

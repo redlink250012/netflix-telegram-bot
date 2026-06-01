@@ -148,17 +148,22 @@ function closeQR() {
   qrModal.classList.add('hidden');
 }
 
+async function checkAndOpenProxy() {
+  var input = cookiesInput.value.trim();
+  if (!input) { showToast('Pega las cookies primero'); return; }
+  showToast('Verificando...', 5000);
+  var data = await apiCheck(input);
+  if (data.error) { showToast('Error: ' + data.error, 4000); return; }
+  if (!data.proxy_url) { showToast('Error: no se generó proxy_url', 4000); return; }
+  window.location.href = data.proxy_url;
+}
+
 function openProxyView() {
   if (!currentData || !currentData.proxy_url) {
     showToast('Primero pegá las cookies y verificá', 3000);
     return;
   }
-  var proxyUrl = currentData.proxy_url;
-  if (tg && tg.openLink) {
-    tg.openLink(window.location.origin + proxyUrl);
-  } else {
-    window.location.href = proxyUrl;
-  }
+  window.location.href = currentData.proxy_url;
 }
 
 function goBack() {
