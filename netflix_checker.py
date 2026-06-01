@@ -78,7 +78,6 @@ def generate_token(cookies_dict: dict) -> tuple:
         with httpx.Client(
             headers={**mobile_headers, "Cookie": cookies_str},
             verify=False,
-            http2=True,
             timeout=15,
         ) as client:
             r = client.post(API_ENDPOINT, json=payload)
@@ -188,7 +187,7 @@ def _scrape_web_info(cookie_str: str, info: dict):
 
     try:
         with httpx.Client(
-            headers=headers, follow_redirects=True, timeout=15, verify=False, http2=True
+            headers=headers, follow_redirects=True, timeout=15, verify=False
         ) as client:
             # /browse para info de suscripcion
             r = client.get(f"{NETFLIX_URL}/browse")
@@ -277,7 +276,7 @@ def _fallback_web_check(cookie_str: str, info: dict) -> bool:
     }
     try:
         with httpx.Client(
-            headers=headers, follow_redirects=True, timeout=20, verify=False, http2=True
+            headers=headers, follow_redirects=True, timeout=20, verify=False
         ) as client:
             r = client.get(f"{NETFLIX_URL}/YourAccount")
             url = str(r.url)
