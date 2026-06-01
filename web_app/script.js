@@ -101,6 +101,14 @@ function openNetflix() {
   }
 }
 
+function openNetflixApp() {
+  if (!currentData.android_intent) {
+    showToast('Solo disponible en Android', 3000);
+    return;
+  }
+  window.location.href = currentData.android_intent;
+}
+
 const COOKIE_EXPORT_KEY = 'nf_cookies_json';
 
 function exportCookies() {
