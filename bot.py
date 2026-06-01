@@ -90,13 +90,10 @@ async def handle_webapp_data(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if profiles:
         text += f"\n👤 *Perfiles:* {', '.join(profiles[:5])}"
 
-    if token_url:
-        text += f"\n\n🔑 *Token generado* (válido ~59min)"
-
     kb = None
     if token_url:
         btn = InlineKeyboardButton(
-            text="▶ Abrir Netflix",
+            text="▶ Abrir Netflix (token)",
             url=token_url,
         )
         kb = InlineKeyboardMarkup([[btn]])
