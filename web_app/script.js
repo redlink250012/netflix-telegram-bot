@@ -94,7 +94,11 @@ function openNetflix() {
     showToast('Generando token...', 3000);
     return;
   }
-  window.location.href = currentTokenUrl;
+  if (tg && tg.openLink) {
+    tg.openLink(currentTokenUrl);
+  } else {
+    window.open(currentTokenUrl, '_blank');
+  }
 }
 
 const COOKIE_EXPORT_KEY = 'nf_cookies_json';
