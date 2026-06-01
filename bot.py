@@ -13,8 +13,9 @@ from netflix_checker import check_cookies, parse_cookies, cookies_to_header
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "AQUI_TU_TOKEN")
-WEBAPP_URL = os.environ.get("WEBAPP_URL", "http://localhost:8080")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8487797010:AAFwo0KdJWy-Gu9tkpVic9CrEVs82S1b1CM")
+RAILWAY_URL = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "localhost:8080")
+WEBAPP_URL = os.environ.get("WEBAPP_URL", f"https://{RAILWAY_URL}")
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 
