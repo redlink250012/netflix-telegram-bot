@@ -1,12 +1,16 @@
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.expand(); tg.ready(); }
 
+const userId = String(tg?.initDataUnsafe?.user?.id || 'anon_' + Date.now());
+
 let currentCookies = '';
 let currentData = null;
 let currentTokenUrl = '';
 
 const loginView = document.getElementById('loginView');
 const dashView = document.getElementById('dashboardView');
+const proxyView = document.getElementById('proxyView');
+const proxyFrame = document.getElementById('proxyFrame');
 const cookiesInput = document.getElementById('cookies');
 const btnCheck = document.getElementById('btnCheck');
 const accountInfo = document.getElementById('accountInfo');
@@ -55,7 +59,7 @@ async function apiCheck(cookies) {
     const r = await fetch('/api/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cookies }),
+      body: JSON.stringify({ cookies, user_id: userId }),
     });
     return await r.json();
   } catch {
@@ -145,9 +149,23 @@ function closeQR() {
   qrModal.classList.add('hidden');
 }
 
+function openProxyView() {
+  dashView.classList.add('hidden');
+  proxyView.style.display = 'flex';
+  proxyFrame.src = '/proxy/browse?user_id=' + encodeURIComponent(userId);
+}
+
+function closeProxyView() {
+  proxyView.style.display = 'none';
+  proxyFrame.src = 'about:blank';
+  dashView.classList.remove('hidden');
+}
+
 function goBack() {
   dashView.classList.add('hidden');
   loginView.classList.remove('hidden');
+  proxyView.style.display = 'none';
+  proxyFrame.src = 'about:blank';
   currentCookies = '';
   currentData = null;
   currentTokenUrl = '';

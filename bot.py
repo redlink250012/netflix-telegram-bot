@@ -1,10 +1,11 @@
 import os
 import json
 import logging
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 import aiohttp
 from aiohttp import web
+from bs4 import BeautifulSoup
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, MessageHandler, filters, CommandHandler, ContextTypes
 
@@ -108,8 +109,13 @@ async def handle_api_check(request: web.Request) -> web.Response:
     try:
         body = await request.json()
         cookie_str = body.get("cookies", "")
+        user_id = body.get("user_id", "")
     except Exception:
         return web.Response(text='{"error": "JSON inválido"}', content_type="application/json", charset="utf-8", status=400)
+
+    # Store cookies for proxy use
+    if user_id:
+        cookies_store[user_id] = cookie_str
 
     result = check_cookies(cookie_str)
 
@@ -160,6 +166,50 @@ async def handle_api_browse(request: web.Request) -> web.Response:
     except Exception as e:
         return web.Response(text=json.dumps({"ok": False, "error": str(e)[:100]}, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
+
+async def handle_proxy(request: web.Request) -> web.Response:
+    path = request.match_info.get("path", "/")
+    if not path.startswith("/"):
+        path = "/" + path
+    user_id = request.query.get("user_id", "")
+    if not user_id or user_id not in cookies_store:
+        return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>❌ Sesión expirada</h1><p>Volvé al inicio y pegá las cookies de nuevo.</p></body></html>', content_type="text/html", charset="utf-8")
+
+    cookies_str = cookies_store[user_id]
+    cookies = parse_cookies(cookies_str)
+    base_url = f"https://{request.host}/proxy"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Cookie": cookies_to_header(cookies),
+    }
+    url = urljoin("https://www.netflix.com", path)
+    connector = aiohttp.TCPConnector(ssl=False)
+
+    try:
+        async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                ct = resp.headers.get("Content-Type", "")
+                if "text/html" in ct:
+                    html = await resp.text()
+                    soup = BeautifulSoup(html, "html.parser")
+                    nf_domains = ("netflix.com", "nflxext.com", "nflximg.net", "nflxvideo.net", "nflxso.net")
+                    for tag, attr in [("a", "href"), ("link", "href"), ("img", "src"), ("script", "src"),
+                                      ("source", "src"), ("video", "src"), ("form", "action")]:
+                        for el in soup.find_all(tag, **{attr: True}):
+                            val = el[attr]
+                            if val.startswith("//"):
+                                el[attr] = f"{base_url}/https:{val}?user_id={user_id}"
+                            elif val.startswith("/"):
+                                el[attr] = f"{base_url}{val}?user_id={user_id}"
+                            elif any(d in val for d in nf_domains):
+                                el[attr] = f"{base_url}/{val}?user_id={user_id}"
+                    return web.Response(text=str(soup), content_type="text/html", charset="utf-8")
+                else:
+                    content = await resp.read()
+                    return web.Response(body=content, content_type=ct)
+    except Exception as e:
+        return web.Response(text=f"Proxy error: {str(e)[:200]}", status=502)
 
 async def handle_static(request: web.Request) -> web.Response:
     path = request.match_info.get("path", "index.html")
@@ -241,6 +291,7 @@ def main():
     app.router.add_get("/api/debug", handle_api_debug)
     app.router.add_post("/api/check", handle_api_check)
     app.router.add_post("/api/browse", handle_api_browse)
+    app.router.add_get("/proxy/{path:.*}", handle_proxy)
 
     log.info(f"🔥 Servidor iniciado en http://{HOST}:{PORT}")
     log.info(f"📱 Web App: {WEBAPP_URL}/web_app/index.html")
