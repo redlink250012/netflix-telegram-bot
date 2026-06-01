@@ -117,7 +117,7 @@ async def handle_webapp_data(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_api_debug(request: web.Request) -> web.Response:
-    return web.Response(text=json.dumps({"status": "ok", "version": "2", "test": "áéíóú"}, ensure_ascii=False), content_type="application/json", charset="utf-8")
+    return web.Response(text=json.dumps({"status": "ok", "version": "2", "test": "áéíóú", "store_keys": list(cookies_store.keys())[:10]}, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
 async def handle_api_check(request: web.Request) -> web.Response:
     try:
@@ -157,6 +157,7 @@ async def handle_api_check(request: web.Request) -> web.Response:
     result["cookies_json"] = json.dumps(json_format, ensure_ascii=False)
     result["session_id"] = session_id
     result["proxy_url"] = f"/proxy/browse?session_id={session_id}"
+    result["_debug_store_keys"] = list(cookies_store.keys())[:5]
 
     return web.Response(text=json.dumps(result, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
