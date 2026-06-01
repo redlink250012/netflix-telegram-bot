@@ -6,6 +6,19 @@ from urllib.parse import urljoin, quote
 import aiohttp
 from aiohttp import web
 from bs4 import BeautifulSoup
+
+COOKIES_FILE = os.path.join(os.path.dirname(__file__), "cookies_store.json")
+
+def load_cookies_store():
+    try:
+        with open(COOKIES_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def save_cookies_store(store):
+    with open(COOKIES_FILE, "w", encoding="utf-8") as f:
+        json.dump(store, f, ensure_ascii=False)
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, MessageHandler, filters, CommandHandler, ContextTypes
 
@@ -20,13 +33,13 @@ WEBAPP_URL = os.environ.get("WEBAPP_URL", f"https://{RAILWAY_URL}")
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 
-cookies_store = {}
+cookies_store = load_cookies_store()
 
 
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     btn = InlineKeyboardButton(
         text="Abrir Netflix Checker",
-        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html"),
+        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html?v=2"),
     )
     kb = InlineKeyboardMarkup([[btn]])
     await update.message.reply_text(
@@ -116,6 +129,7 @@ async def handle_api_check(request: web.Request) -> web.Response:
     # Store cookies for proxy use
     if user_id:
         cookies_store[user_id] = cookie_str
+        save_cookies_store(cookies_store)
 
     result = check_cookies(cookie_str)
 
