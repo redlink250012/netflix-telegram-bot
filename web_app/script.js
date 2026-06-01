@@ -151,11 +151,24 @@ function closeQR() {
 async function checkAndOpenProxy() {
   var input = cookiesInput.value.trim();
   if (!input) { showToast('Pega las cookies primero'); return; }
-  showToast('Verificando...', 5000);
-  var data = await apiCheck(input);
-  if (data.error) { showToast('Error: ' + data.error, 4000); return; }
-  if (!data.proxy_url) { showToast('Error: no se generó proxy_url', 4000); return; }
-  window.location.href = data.proxy_url;
+  var btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Cargando Netflix...';
+  try {
+    var r = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cookies: input }),
+    });
+    var html = await r.text();
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(e) {
+    showToast('Error: ' + e.message, 4000);
+    btn.disabled = false;
+    btn.textContent = '🌐 Ingresar y Abrir Netflix';
+  }
 }
 
 function openProxyView() {
