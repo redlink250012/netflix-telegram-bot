@@ -93,11 +93,13 @@ async def handle_webapp_data(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if token_url:
         text += f"\n\n🔑 *Token generado* (válido ~59min)"
 
-    btn = InlineKeyboardButton(
-        text="🔑 Abrir Netflix con Token",
-        web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html"),
-    )
-    kb = InlineKeyboardMarkup([[btn]])
+    kb = None
+    if token_url:
+        btn = InlineKeyboardButton(
+            text="▶ Abrir Netflix",
+            url=token_url,
+        )
+        kb = InlineKeyboardMarkup([[btn]])
 
     await msg.edit_text(text, parse_mode="Markdown", reply_markup=kb)
 
