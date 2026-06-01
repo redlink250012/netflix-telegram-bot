@@ -44,7 +44,12 @@ def parse_cookies(cookie_str: str) -> dict:
 
 
 def cookies_to_header(cookies: dict) -> str:
-    return "; ".join(f"{k}={v}" for k, v in cookies.items())
+    parts = []
+    for k, v in cookies.items():
+        if any(ord(c) > 127 for c in v):
+            v = quote(v, safe='=&;,./:@!$()*+-_~')
+        parts.append(f"{k}={v}")
+    return "; ".join(parts)
 
 
 def generate_token(cookies_dict: dict) -> tuple:
