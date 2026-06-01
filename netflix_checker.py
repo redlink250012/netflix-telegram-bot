@@ -144,7 +144,7 @@ def check_cookies(cookie_str: str) -> dict:
     token, token_err = generate_token(cookies)
     if token:
         result["token"] = token
-        result["token_url"] = f"https://netflix.com/account?nftoken={quote(token, safe='')}"
+        result["token_url"] = f"https://netflix.com/?nftoken={quote(token, safe='')}"
 
     # 2) Extraer info de perfil desde las cookies
     profile = _extract_from_cookies(cookies)
