@@ -1,5 +1,6 @@
 python-telegram-bot>=20.5
 aiohttp>=3.9
-httpx>=0.24
+httpx[http2]>=0.24
 beautifulsoup4>=4.14
 certifi
+h2>=4.1
