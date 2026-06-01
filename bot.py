@@ -109,7 +109,7 @@ async def handle_api_check(request: web.Request) -> web.Response:
         body = await request.json()
         cookie_str = body.get("cookies", "")
     except Exception:
-        return web.json_response({"error": "JSON inválido"}, status=400)
+        return web.Response(text='{"error": "JSON inválido"}', content_type="application/json", charset="utf-8", status=400)
 
     result = check_cookies(cookie_str)
 
@@ -130,7 +130,7 @@ async def handle_api_check(request: web.Request) -> web.Response:
     ]
     result["cookies_json"] = json.dumps(json_format)
 
-    return web.json_response(result)
+    return web.Response(text=json.dumps(result, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
 
 async def handle_api_browse(request: web.Request) -> web.Response:
