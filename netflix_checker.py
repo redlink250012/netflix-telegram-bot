@@ -129,7 +129,11 @@ def check_cookies(cookie_str: str) -> dict:
     token, token_err = generate_token(cookies)
     if token:
         result["token"] = token
-        result["token_url"] = f"https://netflix.com/?nftoken={quote(token, safe='')}"
+        token_url = f"https://netflix.com/?nftoken={quote(token, safe='')}"
+    android_intent = f"intent://netflix.com/?nftoken={quote(token, safe='')}#Intent;package=com.netflix.mediaclient;end"
+    result["token_url"] = token_url
+    result["android_intent"] = android_intent
+    result["cookies_method"] = "Usá las cookies con Cookie-Editor para reproducción completa. El token solo da acceso básico."
 
     # 2) Extraer info de perfil desde las cookies
     profile = _extract_from_cookies(cookies)

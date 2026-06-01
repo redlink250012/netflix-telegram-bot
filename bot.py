@@ -92,11 +92,11 @@ async def handle_webapp_data(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     kb = None
     if token_url:
-        btn = InlineKeyboardButton(
-            text="▶ Abrir Netflix (token)",
-            url=token_url,
-        )
-        kb = InlineKeyboardMarkup([[btn]])
+        btns = []
+        if result.get("android_intent"):
+            btns.append(InlineKeyboardButton(text="📱 Abrir en App Netflix", url=result["android_intent"]))
+        btns.append(InlineKeyboardButton(text="▶ Abrir en navegador", url=token_url))
+        kb = InlineKeyboardMarkup([btns])
 
     await msg.edit_text(text, parse_mode="Markdown", reply_markup=kb)
 
