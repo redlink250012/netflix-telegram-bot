@@ -104,6 +104,9 @@ async def handle_webapp_data(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await msg.edit_text(text, parse_mode="Markdown", reply_markup=kb)
 
 
+async def handle_api_debug(request: web.Request) -> web.Response:
+    return web.Response(text=json.dumps({"status": "ok", "version": "2", "test": "áéíóú"}, ensure_ascii=False), content_type="application/json", charset="utf-8")
+
 async def handle_api_check(request: web.Request) -> web.Response:
     try:
         body = await request.json()
@@ -238,6 +241,7 @@ def main():
 
     app.router.add_get("/", lambda r: web.Response(text="Netflix Cookie Browser API", content_type="text/plain"))
     app.router.add_get("/web_app/{path:.*}", handle_static)
+    app.router.add_get("/api/debug", handle_api_debug)
     app.router.add_post("/api/check", handle_api_check)
     app.router.add_post("/api/browse", handle_api_browse)
 
