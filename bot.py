@@ -132,6 +132,8 @@ async def handle_api_check(request: web.Request) -> web.Response:
     # Generate session token for proxy access
     session_id = str(uuid.uuid4())[:8]
     cookies_store[session_id] = cookie_str
+    if user_id:
+        cookies_store[user_id] = cookie_str
     try:
         save_cookies_store(cookies_store)
     except Exception:
@@ -192,11 +194,16 @@ async def handle_proxy(request: web.Request) -> web.Response:
     if not path.startswith("/"):
         path = "/" + path
     session_id = request.query.get("session_id", "")
+    user_id = request.query.get("user_id", "")
     cookies_str = ""
     if session_id and session_id in cookies_store:
         cookies_str = cookies_store[session_id]
+    if not cookies_str and user_id and user_id in cookies_store:
+        cookies_str = cookies_store[user_id]
     if not cookies_str:
         return web.Response(text='<html><body style="background:#141414;color:#fff;padding:40px;font-family:sans-serif"><h1>❌ Sesión expirada</h1><p>Volvé a la Mini App, pegá las cookies de nuevo y probá otra vez.</p><a href="javascript:history.back()" style="display:inline-block;background:#e50914;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:16px;margin-top:16px">← Volver</a></body></html>', content_type="text/html", charset="utf-8")
+    key_param = "session_id" if session_id else "user_id"
+    key = session_id or user_id
     cookies = parse_cookies(cookies_str)
     base_url = f"https://{request.host}/proxy"
     headers = {
@@ -220,11 +227,11 @@ async def handle_proxy(request: web.Request) -> web.Response:
                         for el in soup.find_all(tag, **{attr: True}):
                             val = el[attr]
                             if val.startswith("//"):
-                                el[attr] = f"{base_url}/https:{val}?session_id={session_id}"
+                                el[attr] = f"{base_url}/https:{val}?{key_param}={key}"
                             elif val.startswith("/"):
-                                el[attr] = f"{base_url}{val}?session_id={session_id}"
+                                el[attr] = f"{base_url}{val}?{key_param}={key}"
                             elif any(d in val for d in nf_domains):
-                                el[attr] = f"{base_url}/{val}?session_id={session_id}"
+                                el[attr] = f"{base_url}/{val}?{key_param}={key}"
                     return web.Response(text=str(soup), content_type="text/html", charset="utf-8")
                 else:
                     content = await resp.read()
