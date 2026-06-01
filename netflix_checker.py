@@ -34,7 +34,10 @@ def parse_cookies(cookie_str: str) -> dict:
             if isinstance(items, list):
                 for item in items:
                     if isinstance(item, dict) and "name" in item and "value" in item:
-                        cookies[item["name"]] = item["value"]
+                        val = item["value"]
+                        if isinstance(val, str) and "%" in val:
+                            val = unquote(val)
+                        cookies[item["name"]] = val
                 if cookies:
                     return cookies
         except json.JSONDecodeError:
