@@ -38,17 +38,23 @@ cookies_store = load_cookies_store()
 
 
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    btn = InlineKeyboardButton(
-        text="Abrir Netflix Checker",
+    btn1 = InlineKeyboardButton(
+        text="📱 Abrir en Telegram",
         web_app=WebAppInfo(url=f"{WEBAPP_URL}/web_app/index.html"),
     )
-    kb = InlineKeyboardMarkup([[btn]])
+    btn2 = InlineKeyboardButton(
+        text="🌐 Abrir en Chrome/Kiwi",
+        url=f"{WEBAPP_URL}/web_app/index.html",
+    )
+    kb = InlineKeyboardMarkup([[btn1], [btn2]])
     await update.message.reply_text(
         "🎬 *Netflix Cookie Browser*\n\n"
-        "Abrí la mini app para pegar tus cookies de Netflix y acceder a tu cuenta.\n\n"
-        "1. Hacé clic en el botón de abajo\n"
-        "2. Pegá tus cookies (NetflixId + SecureNetflixId)\n"
-        "3. Verificá y navegá tu cuenta",
+        "Para usar Netflix en Android:\n\n"
+        "1. Abrí en **Chrome/Kiwi** (recomendado)\n"
+        "2. Pegá las cookies\n"
+        "3. Copiá el JSON 📋\n"
+        "4. En Chrome/Kiwi abrí Netflix → Cookie-Editor → Import\n\n"
+        "✅ Funciona con video incluido",
         parse_mode="Markdown",
         reply_markup=kb,
     )
@@ -285,6 +291,10 @@ async def handle_proxy(request: web.Request) -> web.Response:
     except Exception as e:
         return web.Response(text=f"Proxy error: {str(e)[:200]}", status=502)
 
+async def handle_redirect(request: web.Request) -> web.Response:
+    raise web.HTTPFound("https://www.netflix.com/browse")
+
+
 async def handle_static(request: web.Request) -> web.Response:
     path = request.match_info.get("path", "index.html")
     filepath = os.path.join(os.path.dirname(__file__), "web_app", path)
@@ -364,6 +374,7 @@ def main():
     app.on_startup.append(run_bot)
     app.on_shutdown.append(cleanup)
 
+    app.router.add_get("/redirect", handle_redirect)
     app.router.add_get("/", lambda r: web.Response(text="Netflix Cookie Browser API", content_type="text/plain"))
     app.router.add_get("/web_app/{path:.*}", handle_static)
     app.router.add_get("/api/debug", handle_api_debug)
