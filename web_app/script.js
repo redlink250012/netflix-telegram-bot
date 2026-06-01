@@ -94,11 +94,7 @@ function openNetflix() {
     showToast('Generando token...', 3000);
     return;
   }
-  if (tg && tg.openLink) {
-    tg.openLink(currentTokenUrl, { try_instant_view: false });
-  } else {
-    window.open(currentTokenUrl, '_blank');
-  }
+  window.location.href = currentTokenUrl;
 }
 
 const COOKIE_EXPORT_KEY = 'nf_cookies_json';
