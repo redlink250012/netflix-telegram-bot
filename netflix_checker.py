@@ -25,6 +25,17 @@ BROWSER_UAS = [
 
 def parse_cookies(cookie_str: str) -> dict:
     cookies = {}
+    # Try Netscape format first (tab-separated columns)
+    if "\t" in cookie_str and ("netflix.com" in cookie_str or ".netflix.com" in cookie_str):
+        for line in cookie_str.strip().split("\n"):
+            parts = line.strip().split("\t")
+            if len(parts) >= 7:
+                name = parts[5].strip()
+                value = parts[6].strip()
+                cookies[name] = value
+        if cookies:
+            return cookies
+    # Standard key=value; key=value format
     for part in cookie_str.split(";"):
         part = part.strip()
         if "=" in part:
