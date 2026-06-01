@@ -26,12 +26,18 @@ BROWSER_UAS = [
 def parse_cookies(cookie_str: str) -> dict:
     cookies = {}
     for line in cookie_str.strip().split("\n"):
-        parts = line.strip().split("\t")
-        if len(parts) >= 7:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split("\t")
+        # Try Netscape format (tab or space separated, domain in column 0)
+        if len(parts) < 7 and "." in parts[0]:
+            parts = line.split()
+        if len(parts) >= 7 and "." in parts[0]:
             name = parts[5].strip()
-            value = parts[6].strip()
+            value = " ".join(parts[6:]).strip()
             cookies[name] = value
-        elif "=" in line and "\t" not in line:
+        elif "=" in line:
             key, _, val = line.partition("=")
             cookies[key.strip()] = val.strip()
     return cookies
