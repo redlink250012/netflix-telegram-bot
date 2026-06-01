@@ -9,8 +9,8 @@ let currentTokenUrl = '';
 
 const loginView = document.getElementById('loginView');
 const dashView = document.getElementById('dashboardView');
-const proxyView = document.getElementById('proxyView');
-const proxyFrame = document.getElementById('proxyFrame');
+var proxyView = document.getElementById('proxyView');
+var proxyFrame = document.getElementById('proxyFrame');
 const cookiesInput = document.getElementById('cookies');
 const btnCheck = document.getElementById('btnCheck');
 const accountInfo = document.getElementById('accountInfo');
@@ -150,22 +150,17 @@ function closeQR() {
 }
 
 function openProxyView() {
-  dashView.classList.add('hidden');
-  proxyView.style.display = 'flex';
-  proxyFrame.src = '/proxy/browse?user_id=' + encodeURIComponent(userId);
-}
-
-function closeProxyView() {
-  proxyView.style.display = 'none';
-  proxyFrame.src = 'about:blank';
-  dashView.classList.remove('hidden');
+  var proxyUrl = '/proxy/browse?user_id=' + encodeURIComponent(userId);
+  if (tg && tg.openLink) {
+    tg.openLink(window.location.origin + proxyUrl);
+  } else {
+    window.location.href = proxyUrl;
+  }
 }
 
 function goBack() {
   dashView.classList.add('hidden');
   loginView.classList.remove('hidden');
-  proxyView.style.display = 'none';
-  proxyFrame.src = 'about:blank';
   currentCookies = '';
   currentData = null;
   currentTokenUrl = '';
