@@ -128,7 +128,7 @@ async def handle_api_check(request: web.Request) -> web.Response:
         }
         for name, value in cookies.items()
     ]
-    result["cookies_json"] = json.dumps(json_format)
+    result["cookies_json"] = json.dumps(json_format, ensure_ascii=False)
 
     return web.Response(text=json.dumps(result, ensure_ascii=False), content_type="application/json", charset="utf-8")
 
